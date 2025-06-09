@@ -1,10 +1,35 @@
 <template>
   <div class="h-screen background-container" :style="wallpaperStyle">
     <div class="top-4 right-4 fixed flex gap-2">
+      <!-- AI Dropdown Menu -->
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+            <Sparkles />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel><span class="font-bold">AI Selection</span></DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem @click="openGeminiTab">Gemini</DropdownMenuItem>
+          <DropdownMenuItem>ChatGpt</DropdownMenuItem>
+          <DropdownMenuItem>DeepSeek</DropdownMenuItem>
+          <DropdownMenuItem>Qwen AI</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <!-- Social Button -->
-      <Button @click="openFacebookTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
-        <Facebook />
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button @click="openFacebookTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+              <Facebook />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <span>Facebook</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <!-- Wallpaper Dropdown Menu -->
       <DropdownMenu>
         <DropdownMenuTrigger>
@@ -13,16 +38,25 @@
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuLabel>Wallpaper</DropdownMenuLabel>
+          <DropdownMenuLabel><span class="font-bold">Wallpaper Menu</span></DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="isWallpaperListDialogOpen = true">Wallpaper List</DropdownMenuItem>
           <DropdownMenuItem @click="isAddWallpaperDialogOpen = true">Add Wallpaper</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <!-- Email Button -->
-      <Button @click="openGmailTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
-        <Mail />
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button @click="openGmailTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+              <Mail />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <span>Gmail</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <!-- Dialog for Wallpaper List -->
       <Dialog :open="isWallpaperListDialogOpen" @update:open="isWallpaperListDialogOpen = $event">
         <DialogContent>
@@ -105,7 +139,7 @@ useHead({
 })
 
 /* Import List */
-import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook } from 'lucide-vue-next'
+import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Sparkles } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -143,6 +177,10 @@ const savedWallpapers = ref<string[]>([])
 
 
 /* Function List */
+const openGeminiTab = () => {
+  const geminiTabUrl = 'https://gemini.google.com/app'
+  window.open(geminiTabUrl, '_blank', 'noopener,noreferrer')
+}
 const openMyPortfolio = () => {
   const portfolioUrl = 'https://yasinhassim.vercel.app'
   window.open(portfolioUrl, '_blank', 'noopener,noreferrer')
