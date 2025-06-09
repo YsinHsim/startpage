@@ -1,19 +1,28 @@
 <template>
   <div class="h-screen background-container" :style="wallpaperStyle">
     <div class="top-4 right-4 fixed flex gap-2">
+      <!-- Social Button -->
+      <Button @click="openFacebookTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+        <Facebook />
+      </Button>
+      <!-- Wallpaper Dropdown Menu -->
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <Button size="icon" variant="ghost" class="transition-all duration-800 hover:bg-white/10 hover:shadow-xl">
-            <Wallpaper class="w-5 h-5" />
+          <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+            <Wallpaper />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuLabel>Wallpaper</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="isWallpaperListDialogOpen = true">Wallpaper List</DropdownMenuItem>
-          <DropdownMenuItem>Add Wallpaper</DropdownMenuItem>
+          <DropdownMenuItem @click="isAddWallpaperDialogOpen = true">Add Wallpaper</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <!-- Email Button -->
+      <Button @click="openGmailTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+        <Mail />
+      </Button>
       <!-- Dialog for Wallpaper List -->
       <Dialog :open="isWallpaperListDialogOpen" @update:open="isWallpaperListDialogOpen = $event">
         <DialogContent>
@@ -40,62 +49,49 @@
 
         </DialogContent>
       </Dialog>
-      <Dialog class="fixed top-10 right-10">
-        <DialogTrigger as-child>
-          <Button class="primaryColor shadow">
-            <Wallpaper class="w-5 h-5 mr-1" /> Wallpaper
-          </Button>
-        </DialogTrigger>
-        <DialogContent class="w-full">
+      <!-- Dialog for Add Wallpaper -->
+      <Dialog :open="isAddWallpaperDialogOpen" @update:open="isAddWallpaperDialogOpen = $event">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Wallpaper Setting</DialogTitle>
+            <DialogTitle>Add Wallpaper</DialogTitle>
           </DialogHeader>
-          <Accordion type="single" collapsible :default-value="defaultAccordianValue">
-            <AccordionItem value="wallpaperList">
-              <AccordionTrigger>Wallpaper List</AccordionTrigger>
-              <AccordionContent>
-                <div v-if="savedWallpapers.length > 0" class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2">
-                  <div v-for="(url, index) in savedWallpapers" :key="index"
-                      class="flex items-center gap-2 p-2 border rounded-md text-sm break-all"
-                      :class="{ 'bg-blue-100 dark:bg-blue-900 border-blue-400': url === wallpaperUrl }"
-                  >
-                    <span class="text-sm">{{ url }}</span>
-                    <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
-                    <Button size="sm" variant="destructive" @click="deleteWallpaper(url)">Delete</Button>
-                  </div>
-                </div>
-                <div v-else class="text-center text-gray-500">
-                  No wallpapers saved yet.
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="saveWallpaperUrl">
-              <AccordionTrigger>Add New Wallpaper?</AccordionTrigger>
-              <AccordionContent>
-                <div class="flex flex-col gap-2">
-                  <Input id="add-image-url" type="text" v-model="newWallpaperInput" @keydown.enter="addWallpaper" placeholder="Enter image url.." />
-                  <Button class="primaryColor" @click="addWallpaper">Add Wallpaper</Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+
+          <div class="flex flex-col gap-2">
+            <Input id="add-image-url" type="text" v-model="newWallpaperInput" @keydown.enter="addWallpaper" placeholder="Enter image url.." />
+            <Button class="primaryColor" @click="addWallpaper">Add Wallpaper</Button>
+          </div>
+
         </DialogContent>
       </Dialog>
     </div>
     <div class="flex justify-center items-center h-full">
-      <div class="p-4 w-2/5 shadow-2xl rounded-sm bg-white ">
+      <!-- Search Card -->
+      <div class="p-4 w-2/5 shadow-2xl rounded-sm bg-white">
         <div class="mb-2 text-center">
           <p class="font-bold text-3xl">{{ currentTime }}</p>
-          <p class="font-light text-2xl">{{ currentDay }}</p>
+          <p class="font-extralight text-2xl mb-4">{{ currentDay }}</p>
         </div>
         <div class="flex gap-2 w-full">
           <Input type="text" v-model="searchInput" @keydown.enter="performSearch" placeholder="Search" />
-          <Button @click="performSearch" class="primaryColor">
+          <Button @click="performSearch">
             <Search class="w-5 h-5 mr-1" /> Search
           </Button>
         </div>
       </div>
     </div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger as-child>
+          <Button @click="openMyPortfolio" size="icon" variant="ghost" class="transition-all duration-500 hover:shadow-xl hover:bg-white/10 fixed bottom-2 left-2">
+            <ChevronsLeftRightEllipsis />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="right">
+          <span>About Developer</span>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+    
   </div>
 </template>
 
@@ -109,7 +105,7 @@ useHead({
 })
 
 /* Import List */
-import { Wallpaper, Search } from 'lucide-vue-next'
+import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -122,7 +118,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip'
 
 /* Variable List */
 const currentDay = ref('');
@@ -131,6 +132,7 @@ let timer: NodeJS.Timeout | null = null
 const searchInput = ref('')
 const defaultAccordianValue = 'wallpaperList'
 const isWallpaperListDialogOpen = ref(false)
+const isAddWallpaperDialogOpen = ref(false)
 
 const wallpaperUrl = ref('') // Stores the active wallpaper URL
 const newWallpaperInput = ref('') // Input for adding new wallpaper
@@ -141,6 +143,21 @@ const savedWallpapers = ref<string[]>([])
 
 
 /* Function List */
+const openMyPortfolio = () => {
+  const portfolioUrl = 'https://yasinhassim.vercel.app'
+  window.open(portfolioUrl, '_blank', 'noopener,noreferrer')
+}
+
+const openGmailTab = () => {
+  const gmailTabUrl = 'https://mail.google.com/mail/?tab=rm&ogbl'
+  window.open(gmailTabUrl, '_blank', 'noopener,noreferrer')
+}
+
+const openFacebookTab = () => {
+  const facebookUrlTab = 'https://www.facebook.com/'
+  window.open(facebookUrlTab, '_blank', 'noopener,noreferrer')
+}
+
 const updateDateTime = () => {
   const now = new Date()
 
