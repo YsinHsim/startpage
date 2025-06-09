@@ -1,0 +1,336 @@
+<template>
+  <div class="h-screen background-container" :style="wallpaperStyle">
+    <div class="top-4 right-4 fixed flex gap-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button size="icon" variant="ghost" class="transition-all duration-800 hover:bg-white/10 hover:shadow-xl">
+            <Wallpaper class="w-5 h-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>Wallpaper</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem @click="isWallpaperListDialogOpen = true">Wallpaper List</DropdownMenuItem>
+          <DropdownMenuItem>Add Wallpaper</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <!-- Dialog for Wallpaper List -->
+      <Dialog :open="isWallpaperListDialogOpen" @update:open="isWallpaperListDialogOpen = $event">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Saved Wallpapers</DialogTitle>
+            <DialogDescription>
+              Apply or delete your saved wallpapers from this list.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div v-if="savedWallpapers.length > 0" class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2">
+            <div v-for="(url, index) in savedWallpapers" :key="index"
+                class="flex items-center gap-2 p-2 border rounded-md text-sm break-all"
+                :class="{ 'bg-blue-100 dark:bg-blue-900 border-blue-400': url === wallpaperUrl }"
+            >
+              <span class="text-sm">{{ url }}</span>
+              <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
+              <Button size="sm" variant="destructive" @click="deleteWallpaper(url)">Delete</Button>
+            </div>
+          </div>
+          <div v-else class="text-center text-gray-500">
+            No wallpapers saved yet.
+          </div>
+
+        </DialogContent>
+      </Dialog>
+      <Dialog class="fixed top-10 right-10">
+        <DialogTrigger as-child>
+          <Button class="primaryColor shadow">
+            <Wallpaper class="w-5 h-5 mr-1" /> Wallpaper
+          </Button>
+        </DialogTrigger>
+        <DialogContent class="w-full">
+          <DialogHeader>
+            <DialogTitle>Wallpaper Setting</DialogTitle>
+          </DialogHeader>
+          <Accordion type="single" collapsible :default-value="defaultAccordianValue">
+            <AccordionItem value="wallpaperList">
+              <AccordionTrigger>Wallpaper List</AccordionTrigger>
+              <AccordionContent>
+                <div v-if="savedWallpapers.length > 0" class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2">
+                  <div v-for="(url, index) in savedWallpapers" :key="index"
+                      class="flex items-center gap-2 p-2 border rounded-md text-sm break-all"
+                      :class="{ 'bg-blue-100 dark:bg-blue-900 border-blue-400': url === wallpaperUrl }"
+                  >
+                    <span class="text-sm">{{ url }}</span>
+                    <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
+                    <Button size="sm" variant="destructive" @click="deleteWallpaper(url)">Delete</Button>
+                  </div>
+                </div>
+                <div v-else class="text-center text-gray-500">
+                  No wallpapers saved yet.
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="saveWallpaperUrl">
+              <AccordionTrigger>Add New Wallpaper?</AccordionTrigger>
+              <AccordionContent>
+                <div class="flex flex-col gap-2">
+                  <Input id="add-image-url" type="text" v-model="newWallpaperInput" @keydown.enter="addWallpaper" placeholder="Enter image url.." />
+                  <Button class="primaryColor" @click="addWallpaper">Add Wallpaper</Button>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </DialogContent>
+      </Dialog>
+    </div>
+    <div class="flex justify-center items-center h-full">
+      <div class="p-4 w-2/5 shadow-2xl rounded-sm bg-white ">
+        <div class="mb-2 text-center">
+          <p class="font-bold text-3xl">{{ currentTime }}</p>
+          <p class="font-light text-2xl">{{ currentDay }}</p>
+        </div>
+        <div class="flex gap-2 w-full">
+          <Input type="text" v-model="searchInput" @keydown.enter="performSearch" placeholder="Search" />
+          <Button @click="performSearch" class="primaryColor">
+            <Search class="w-5 h-5 mr-1" /> Search
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+
+useHead({
+  titleTemplate: (titleChunk) => {
+    return titleChunk ? `${titleChunk} - Startpage` : 'Creation By Yasin Hassim';
+  }
+})
+
+/* Import List */
+import { Wallpaper, Search } from 'lucide-vue-next'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+
+/* Variable List */
+const currentDay = ref('');
+const currentTime = ref('');
+let timer: NodeJS.Timeout | null = null
+const searchInput = ref('')
+const defaultAccordianValue = 'wallpaperList'
+const isWallpaperListDialogOpen = ref(false)
+
+const wallpaperUrl = ref('') // Stores the active wallpaper URL
+const newWallpaperInput = ref('') // Input for adding new wallpaper
+const defaultWallpaper = 'https://pbs.twimg.com/media/GqiNuAWXYAA0MDD?format=jpg&name=large'
+
+// Array to store all saved wallpaper URLs
+const savedWallpapers = ref<string[]>([])
+
+
+/* Function List */
+const updateDateTime = () => {
+  const now = new Date()
+
+  // Get current day (e.g., "Monday", "Tuesday")
+  currentDay.value = now.toLocaleDateString('en-US', { weekday: 'long' })
+
+  // Get current time in HH:MM (24-hour) format
+  currentTime.value = now.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23' // Ensures 24-hour format
+  })
+}
+
+const performSearch = () => {
+  const query = searchInput.value.trim()
+
+  if (query) {
+    const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`
+    // Open the URL in a new tab/window
+    window.open(googleSearchUrl, '_blank')
+    searchInput.value = ''
+  }
+}
+
+// Function to add a new wallpaper to the list
+const addWallpaper = () => {
+  const url = newWallpaperInput.value.trim()
+  if (url) {
+    try {
+      new URL(url) // Basic URL validation
+      if (!savedWallpapers.value.includes(url)) { // Avoid duplicates
+        savedWallpapers.value.push(url)
+        // NEW TRY-CATCH FOR LOCALSTORAGE.SETITEM
+        try {
+          localStorage.setItem('savedWallpapers', JSON.stringify(savedWallpapers.value))
+          console.log('addWallpaper: "savedWallpapers" set in localStorage to:', JSON.stringify(savedWallpapers.value));
+        } catch (storageError) {
+          console.error('addWallpaper: Error saving "savedWallpapers" to localStorage:', storageError);
+          alert('Failed to save wallpaper list. Your browser storage might be full or restricted.');
+        }
+      }
+      applySavedWallpaper(url) // Apply the newly added wallpaper
+      newWallpaperInput.value = '' // Clear the input field
+    } catch (e) {
+      alert('Please enter a valid URL for the wallpaper')
+      console.error('Invalid URL or other error in addWallpaper:', e)
+    }
+  } else {
+    alert('Please enter a wallpaper URL')
+  }
+}
+
+// Function to apply a wallpaper from the saved list
+const applySavedWallpaper = (url: string) => {
+  wallpaperUrl.value = url
+  localStorage.setItem('userActiveWallpaper', url)
+  // NEW DIAGNOSTIC LOG: Confirm userActiveWallpaper set operation
+  console.log('applySavedWallpaper: "userActiveWallpaper" set in localStorage to:', url);
+}
+
+// Function to delete a wallpaper from the list
+const deleteWallpaper = (urlToDelete: string) => {
+  savedWallpapers.value = savedWallpapers.value.filter(url => url !== urlToDelete)
+  localStorage.setItem('savedWallpapers', JSON.stringify(savedWallpapers.value)) // Save the updated array
+  console.log('deleteWallpaper: "savedWallpapers" updated in localStorage to:', JSON.stringify(savedWallpapers.value));
+
+  // If the deleted wallpaper was the currently active one, set to default
+  if (wallpaperUrl.value === urlToDelete) {
+    wallpaperUrl.value = defaultWallpaper
+    localStorage.removeItem('userActiveWallpaper') // Clear active wallpaper from storage
+    console.log('deleteWallpaper: "userActiveWallpaper" removed or set to default.');
+  }
+  // If the list becomes empty and it's not already default, reset to default
+  if (savedWallpapers.value.length === 0 && wallpaperUrl.value !== defaultWallpaper) {
+      wallpaperUrl.value = defaultWallpaper;
+      localStorage.removeItem('userActiveWallpaper');
+      console.log('deleteWallpaper: "userActiveWallpaper" removed due to empty list.');
+  }
+}
+
+
+/* Computed Property for Wallpaper Style */
+const wallpaperStyle = computed(() => {
+  const imageUrl = wallpaperUrl.value || defaultWallpaper // Use default if wallpaperUrl is empty
+  return {
+    backgroundImage: `url('${imageUrl}')`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    filter: 'brightness(0. 2)' // Example: makes background slightly darker
+  }
+})
+
+
+/* onMounted List */
+onMounted(() => {
+  // Update immediately when component mounts
+  updateDateTime()
+  // Update every second for a live clock effect
+  timer = setInterval(updateDateTime, 1000)
+
+  // Load saved wallpapers list from local storage
+  const storedWallpapers = localStorage.getItem('savedWallpapers')
+  console.log('onMounted: Value retrieved from localStorage for "savedWallpapers":', storedWallpapers); // Diagnostic log here
+  if (storedWallpapers) {
+    try {
+      const parsedWallpapers = JSON.parse(storedWallpapers)
+      console.log('onMounted: Successfully parsed "savedWallpapers". Data:', parsedWallpapers);
+      if (Array.isArray(parsedWallpapers)) {
+        savedWallpapers.value = parsedWallpapers
+        console.log('onMounted: savedWallpapers ref value updated to:', savedWallpapers.value)
+      }
+    } catch (e) {
+      console.error("onMounted: Failed to parse saved wallpapers from localStorage:", e)
+      localStorage.removeItem('savedWallpapers') // Clear corrupted data
+      console.log('onMounted: "savedWallpapers" removed from localStorage due to parse error.');
+    }
+  } else {
+    console.log('onMounted: "savedWallpapers" was null or empty in localStorage.');
+  }
+
+
+  // Load the currently active wallpaper
+  const activeWallpaper = localStorage.getItem('userActiveWallpaper')
+  console.log('onMounted: Value retrieved from localStorage for "userActiveWallpaper":', activeWallpaper);
+  if (activeWallpaper) {
+    wallpaperUrl.value = activeWallpaper
+  } else {
+    // If no active wallpaper set, but there are saved ones, apply the first one
+    if (savedWallpapers.value.length > 0) {
+      applySavedWallpaper(savedWallpapers.value[0]);
+      console.log('onMounted: No active wallpaper, applying first saved wallpaper.');
+    } else {
+      wallpaperUrl.value = defaultWallpaper; // Fallback to default if no saved or active
+      console.log('onMounted: No active or saved wallpapers, applying default wallpaper.');
+    }
+  }
+})
+
+// When the component is unmounted (removed from the page)
+onUnmounted(() => {
+  // Clear the interval to prevent memory leaks
+  if (timer) {
+    clearInterval(timer)
+  }
+})
+</script>
+
+<style>
+/* Base styles for the page */
+body {
+  font-family: sans-serif;
+  margin: 0;
+}
+
+/* Ensure the background container always covers the screen */
+.background-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 0;
+}
+
+/* Adds a subtle dark overlay for better text readability on varying wallpapers */
+.background-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3); /* Dark overlay */
+  z-index: -1; /* Ensure overlay is behind content but in front of background image */
+}
+
+/* Custom button primary color */
+.primaryColor {
+  background-color: #0284c7; /* Tailwind's sky-600 */
+  transition: background-color 0.3s ease; /* Smooth transition for hover */
+}
+
+.primaryColor:hover {
+  background-color: #0369a1; /* Tailwind's sky-700 */
+}
+
+/* Additional utility class (if needed for labels, etc.) */
+.labelColor {
+  color: #424949;
+}
+
+</style>
