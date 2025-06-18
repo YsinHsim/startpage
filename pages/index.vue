@@ -80,7 +80,7 @@
               <CarouselContent>
                 <CarouselItem>
                   <div class="p-2 flex flex-col gap-2">
-                    <img :src="defaultWallpaper" alt="Wallpaper" class="rounded shadow-lg"/>
+                    <img :src="defaultWallpaper" alt="defaultWallpaper" class="rounded shadow-lg"/>
                     <div class="flex justify-center gap-2">
                       <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
                       <Button size="sm" variant="destructive" disabled @click="deleteWallpaper(url)">Delete</Button>
@@ -104,8 +104,8 @@
           <div v-else class="text-center text-gray-500">
             <!-- No wallpapers saved yet. -->
             <p class="italic">Currently only default wallpaper available.</p>
-            <div> 
-              
+            <div class="flex flex-col gap-2 mt-2"> 
+              <img :src="defaultWallpaper" alt="defaultWallpaper" class="rounded shadow-lg" />
             </div>
           </div>
 
@@ -120,7 +120,7 @@
 
           <div class="flex flex-col gap-2">
             <Input id="add-image-url" type="text" v-model="newWallpaperInput" @keydown.enter="addWallpaper" placeholder="Enter image url.." />
-            <Button class="primaryColor" @click="addWallpaper">Add Wallpaper</Button>
+            <Button @click="addWallpaper">Add Wallpaper</Button>
           </div>
 
         </DialogContent>
@@ -162,12 +162,12 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 
 useHead({
   titleTemplate: (titleChunk) => {
-    return titleChunk ? `${titleChunk} - Startpage` : 'Creation By Yasin Hassim';
+    return titleChunk ? `${titleChunk} - Startpage` : 'Meow Startpage';
   }
 })
 
 /* Import List */
-import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Sparkles } from 'lucide-vue-next'
+import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Sparkles, Bone } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
