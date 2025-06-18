@@ -12,9 +12,9 @@
           <DropdownMenuLabel><span class="font-bold">AI Selection</span></DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem @click="openGeminiTab">Gemini</DropdownMenuItem>
-          <DropdownMenuItem>ChatGpt</DropdownMenuItem>
-          <DropdownMenuItem>DeepSeek</DropdownMenuItem>
-          <DropdownMenuItem>Qwen AI</DropdownMenuItem>
+          <DropdownMenuItem @click="openChatGptTab">ChatGpt</DropdownMenuItem>
+          <DropdownMenuItem @click="openDeepSeekTab">DeepSeek</DropdownMenuItem>
+          <DropdownMenuItem @click="openQwenAiTab">Qwen AI</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <!-- Social Button -->
@@ -177,6 +177,18 @@ const savedWallpapers = ref<string[]>([])
 
 
 /* Function List */
+const openQwenAiTab = () => {
+  const qwenAiTabUrl = 'https://chat.qwen.ai/'
+  window.open(qwenAiTabUrl, '_blank', 'noopener,noreferrer')
+}
+const openDeepSeekTab = () => {
+  const deepSeekTabUrl = 'https://chat.deepseek.com/'
+  window.open(deepSeekTabUrl, '_blank', 'noopener,noreferrer')
+}
+const openChatGptTab = () => {
+  const chatGptTabUrl = 'https://chatgpt.com/'
+  window.open(chatGptTabUrl, '_blank', 'noopener,noreferrer')
+}
 const openGeminiTab = () => {
   const geminiTabUrl = 'https://gemini.google.com/app'
   window.open(geminiTabUrl, '_blank', 'noopener,noreferrer')
