@@ -67,18 +67,46 @@
             </DialogDescription>
           </DialogHeader>
           
-          <div v-if="savedWallpapers.length > 0" class="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2">
-            <div v-for="(url, index) in savedWallpapers" :key="index"
+          <div v-if="savedWallpapers.length > 0" class="flex justify-center">
+            <!-- <div v-for="(url, index) in savedWallpapers" :key="index"
                 class="flex items-center gap-2 p-2 border rounded-md text-sm break-all"
                 :class="{ 'bg-blue-100 dark:bg-blue-900 border-blue-400': url === wallpaperUrl }"
             >
               <span class="text-sm">{{ url }}</span>
               <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
               <Button size="sm" variant="destructive" @click="deleteWallpaper(url)">Delete</Button>
-            </div>
+            </div> -->
+            <Carousel class="relative w-full max-w-xs">
+              <CarouselContent>
+                <CarouselItem>
+                  <div class="p-2 flex flex-col gap-2">
+                    <img :src="defaultWallpaper" alt="Wallpaper" class="rounded shadow-lg"/>
+                    <div class="flex justify-center gap-2">
+                      <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
+                      <Button size="sm" variant="destructive" disabled @click="deleteWallpaper(url)">Delete</Button>
+                    </div>
+                  </div>
+                </CarouselItem>
+                <CarouselItem v-for="(url , index) in savedWallpapers" :key="index">
+                  <div class="p-2 flex flex-col gap-2">
+                    <img :src="url" alt="Wallpaper" class="rounded shadow-lg"/>
+                    <div class="flex justify-center gap-2">
+                      <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
+                      <Button size="sm" variant="destructive" @click="deleteWallpaper(url)">Delete</Button>
+                    </div>
+                  </div>
+                </CarouselItem>
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
           </div>
           <div v-else class="text-center text-gray-500">
-            No wallpapers saved yet.
+            <!-- No wallpapers saved yet. -->
+            <p class="italic">Currently only default wallpaper available.</p>
+            <div> 
+              
+            </div>
           </div>
 
         </DialogContent>
@@ -144,6 +172,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
 import {
   DropdownMenu,
   DropdownMenuContent,
