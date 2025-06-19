@@ -17,6 +17,39 @@
           <DropdownMenuItem @click="openQwenAiTab">Qwen AI</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <!-- Search Engine Dropdown Menu -->
+      <!-- <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+            <Globe />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel><span class="font-bold">Search Engine</span></DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>Google</DropdownMenuItem>
+          <DropdownMenuItem>DuckDuckGo</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu> -->
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+            <component :is="selectedSearchEngine.icon" class="w-5 h-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel><span class="font-bold">Search Engine</span></DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            v-for="engine in searchEngines" 
+            :key="engine.name" 
+            @click="setSearchEngine(engine)"
+          >
+            <component :is="engine.icon" class="w-4 h-4 mr-2" />
+            {{ engine.name }}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <!-- Social Button -->
       <TooltipProvider>
         <Tooltip>
@@ -44,19 +77,20 @@
           <DropdownMenuItem @click="isAddWallpaperDialogOpen = true">Add Wallpaper</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <!-- Email Button -->
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button @click="openGmailTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
-              <Mail />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <span>Gmail</span>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <!-- Dialog for Add Wallpaper -->
+      <Dialog :open="isAddWallpaperDialogOpen" @update:open="isAddWallpaperDialogOpen = $event">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Wallpaper</DialogTitle>
+          </DialogHeader>
+
+          <div class="flex flex-col gap-2">
+            <Input id="add-image-url" type="text" v-model="newWallpaperInput" @keydown.enter="addWallpaper" placeholder="Enter image url.." />
+            <Button @click="addWallpaper">Add Wallpaper</Button>
+          </div>
+
+        </DialogContent>
+      </Dialog>
       <!-- Dialog for Wallpaper List -->
       <Dialog :open="isWallpaperListDialogOpen" @update:open="isWallpaperListDialogOpen = $event">
         <DialogContent>
@@ -111,20 +145,19 @@
 
         </DialogContent>
       </Dialog>
-      <!-- Dialog for Add Wallpaper -->
-      <Dialog :open="isAddWallpaperDialogOpen" @update:open="isAddWallpaperDialogOpen = $event">
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Wallpaper</DialogTitle>
-          </DialogHeader>
-
-          <div class="flex flex-col gap-2">
-            <Input id="add-image-url" type="text" v-model="newWallpaperInput" @keydown.enter="addWallpaper" placeholder="Enter image url.." />
-            <Button @click="addWallpaper">Add Wallpaper</Button>
-          </div>
-
-        </DialogContent>
-      </Dialog>
+      <!-- Email Button -->
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button @click="openGmailTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+              <Mail />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <span>Gmail</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
     <div class="flex justify-center items-center h-full shadow-lg">
       <!-- Search Card -->
@@ -134,6 +167,10 @@
           <p class="font-extralight text-2xl mb-4">{{ currentDay }}</p>
         </div>
         <div class="flex gap-2 w-full">
+          <!-- <Input type="text" v-model="searchInput" @keydown.enter="performSearch" placeholder="Search" />
+          <Button @click="performSearch">
+            <Search class="w-5 h-5 mr-1" /> Search
+          </Button> -->
           <Input type="text" v-model="searchInput" @keydown.enter="performSearch" placeholder="Search" />
           <Button @click="performSearch">
             <Search class="w-5 h-5 mr-1" /> Search
@@ -153,7 +190,6 @@
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-    
   </div>
 </template>
 
@@ -167,7 +203,7 @@ useHead({
 })
 
 /* Import List */
-import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Sparkles, Bone } from 'lucide-vue-next'
+import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Sparkles, Globe, Bird, Earth } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -204,6 +240,11 @@ const defaultWallpaper = 'https://pbs.twimg.com/media/GqiNuAWXYAA0MDD?format=jpg
 // Array to store all saved wallpaper URLs
 const savedWallpapers = ref<string[]>([])
 
+const searchEngines = ref([
+  { name: 'Google', urlTemplate: 'https://www.google.com/search?q=', icon: Earth },
+  { name: 'DuckDuckGo', urlTemplate: 'https://duckduckgo.com/?q=', icon: Bird }
+])
+const selectedSearchEngine = ref(searchEngines.value[0])
 
 /* Function List */
 const openQwenAiTab = () => {
@@ -226,15 +267,19 @@ const openMyPortfolio = () => {
   const portfolioUrl = 'https://yasinhassim.vercel.app'
   window.open(portfolioUrl, '_blank', 'noopener,noreferrer')
 }
-
 const openGmailTab = () => {
   const gmailTabUrl = 'https://mail.google.com/mail/?tab=rm&ogbl'
   window.open(gmailTabUrl, '_blank', 'noopener,noreferrer')
 }
-
 const openFacebookTab = () => {
   const facebookUrlTab = 'https://www.facebook.com/'
   window.open(facebookUrlTab, '_blank', 'noopener,noreferrer')
+}
+
+const setSearchEngine = (engine: typeof searchEngines.value[0]) => {
+  selectedSearchEngine.value = engine
+  // Save the user's choice to local storage so it's remembered
+  localStorage.setItem('userSelectedEngine', engine.name)
 }
 
 const updateDateTime = () => {
@@ -251,6 +296,7 @@ const updateDateTime = () => {
   })
 }
 
+/* 
 const performSearch = () => {
   const query = searchInput.value.trim()
 
@@ -258,6 +304,18 @@ const performSearch = () => {
     const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`
     // Open the URL in a new tab/window
     window.open(googleSearchUrl, '_blank')
+    searchInput.value = ''
+  }
+} */
+const performSearch = () => {
+  const query = searchInput.value.trim()
+
+  if (query) {
+    // Use the urlTemplate from the *selected* search engine
+    const searchUrl = `${selectedSearchEngine.value.urlTemplate}${encodeURIComponent(query)}`
+    
+    // Open the URL in a new tab/window
+    window.open(searchUrl, '_blank')
     searchInput.value = ''
   }
 }
@@ -359,7 +417,6 @@ onMounted(() => {
     console.log('onMounted: "savedWallpapers" was null or empty in localStorage.');
   }
 
-
   // Load the currently active wallpaper
   const activeWallpaper = localStorage.getItem('userActiveWallpaper')
   console.log('onMounted: Value retrieved from localStorage for "userActiveWallpaper":', activeWallpaper);
@@ -373,6 +430,14 @@ onMounted(() => {
     } else {
       wallpaperUrl.value = defaultWallpaper; // Fallback to default if no saved or active
       console.log('onMounted: No active or saved wallpapers, applying default wallpaper.');
+    }
+  }
+
+  const savedEngineName = localStorage.getItem('userSelectedEngine')
+  if (savedEngineName) {
+    const foundEngine = searchEngines.value.find(e => e.name === savedEngineName)
+    if (foundEngine) {
+      selectedSearchEngine.value = foundEngine
     }
   }
 })
