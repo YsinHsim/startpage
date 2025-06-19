@@ -126,10 +126,10 @@
         </DialogContent>
       </Dialog>
     </div>
-    <div class="flex justify-center items-center h-full">
+    <div class="flex justify-center items-center h-full shadow-lg">
       <!-- Search Card -->
       <div class="p-4 w-2/5 shadow-2xl rounded-sm bg-white">
-        <div class="mb-2 text-center">
+        <div class="mb-8 mt-4 text-center">
           <p class="font-bold text-3xl">{{ currentTime }}</p>
           <p class="font-extralight text-2xl mb-4">{{ currentDay }}</p>
         </div>
