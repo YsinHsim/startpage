@@ -18,19 +18,6 @@
         </DropdownMenuContent>
       </DropdownMenu>
       <!-- Search Engine Dropdown Menu -->
-      <!-- <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
-            <Globe />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel><span class="font-bold">Search Engine</span></DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Google</DropdownMenuItem>
-          <DropdownMenuItem>DuckDuckGo</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu> -->
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
@@ -102,14 +89,6 @@
           </DialogHeader>
           
           <div v-if="savedWallpapers.length > 0" class="flex justify-center">
-            <!-- <div v-for="(url, index) in savedWallpapers" :key="index"
-                class="flex items-center gap-2 p-2 border rounded-md text-sm break-all"
-                :class="{ 'bg-blue-100 dark:bg-blue-900 border-blue-400': url === wallpaperUrl }"
-            >
-              <span class="text-sm">{{ url }}</span>
-              <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
-              <Button size="sm" variant="destructive" @click="deleteWallpaper(url)">Delete</Button>
-            </div> -->
             <Carousel class="relative w-full max-w-xs">
               <CarouselContent>
                 <CarouselItem>
@@ -167,10 +146,6 @@
           <p class="font-extralight text-2xl mb-4">{{ currentDay }}</p>
         </div>
         <div class="flex gap-2 w-full">
-          <!-- <Input type="text" v-model="searchInput" @keydown.enter="performSearch" placeholder="Search" />
-          <Button @click="performSearch">
-            <Search class="w-5 h-5 mr-1" /> Search
-          </Button> -->
           <Input type="text" v-model="searchInput" @keydown.enter="performSearch" placeholder="Search" />
           <Button @click="performSearch">
             <Search class="w-5 h-5 mr-1" /> Search
@@ -296,17 +271,6 @@ const updateDateTime = () => {
   })
 }
 
-/* 
-const performSearch = () => {
-  const query = searchInput.value.trim()
-
-  if (query) {
-    const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`
-    // Open the URL in a new tab/window
-    window.open(googleSearchUrl, '_blank')
-    searchInput.value = ''
-  }
-} */
 const performSearch = () => {
   const query = searchInput.value.trim()
 
