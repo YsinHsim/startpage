@@ -50,6 +50,18 @@
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button @click="openInstagramTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+              <Instagram />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent size="bottom">
+            <span>Instagram</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <!-- Wallpaper Dropdown Menu -->
       <DropdownMenu>
         <DropdownMenuTrigger>
@@ -178,7 +190,7 @@ useHead({
 })
 
 /* Import List */
-import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Sparkles, Globe, Bird, Earth } from 'lucide-vue-next'
+import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Instagram, Sparkles, Globe, Bird, Earth } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -249,6 +261,10 @@ const openGmailTab = () => {
 const openFacebookTab = () => {
   const facebookUrlTab = 'https://www.facebook.com/'
   window.open(facebookUrlTab, '_blank', 'noopener,noreferrer')
+}
+const openInstagramTab = () => {
+  const instagramUrlTab = 'https://www.instagram.com/'
+  window.open(instagramUrlTab, '_blank', 'noopener,noreferrer')
 }
 
 const setSearchEngine = (engine: typeof searchEngines.value[0]) => {
