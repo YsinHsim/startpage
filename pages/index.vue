@@ -17,6 +17,19 @@
           <DropdownMenuItem @click="openQwenAiTab">Qwen AI</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <!-- Music Button -->
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button @click="openYoutubeMusicTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+              <Music4 />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <span>Music</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <!-- Search Engine Dropdown Menu -->
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
@@ -190,7 +203,7 @@ useHead({
 })
 
 /* Import List */
-import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Instagram, Sparkles, Globe, Bird, Earth } from 'lucide-vue-next'
+import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Instagram, Sparkles, Globe, Bird, Earth, Music4 } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -253,6 +266,10 @@ const openGeminiTab = () => {
 const openMyPortfolio = () => {
   const portfolioUrl = 'https://yasinhassim.vercel.app'
   window.open(portfolioUrl, '_blank', 'noopener,noreferrer')
+}
+const openYoutubeMusicTab = () => {
+  const youtubeMusicUrl = 'https://music.youtube.com/'
+  window.open(youtubeMusicUrl, '_blank', 'noopener,noreferrer')
 }
 const openGmailTab = () => {
   const gmailTabUrl = 'https://mail.google.com/mail/?tab=rm&ogbl'
