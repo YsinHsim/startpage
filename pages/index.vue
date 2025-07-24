@@ -30,6 +30,19 @@
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+      <!-- Youtube Button -->
+       <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button @click="openYoutubeTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+              <Youtube />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <span>Youtube</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <!-- Search Engine Dropdown Menu -->
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
@@ -203,7 +216,7 @@ useHead({
 })
 
 /* Import List */
-import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Instagram, Sparkles, Globe, Bird, Earth, Music4 } from 'lucide-vue-next'
+import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Instagram, Sparkles, Globe, Bird, Earth, Music4, Youtube } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -270,6 +283,10 @@ const openMyPortfolio = () => {
 const openYoutubeMusicTab = () => {
   const youtubeMusicUrl = 'https://music.youtube.com/'
   window.open(youtubeMusicUrl, '_blank', 'noopener,noreferrer')
+}
+const openYoutubeTab = () => {
+  const youtubeUrl = 'https://www.youtube.com/'
+  window.open(youtubeUrl, '_blank', 'noopener,noreferrer')
 }
 const openGmailTab = () => {
   const gmailTabUrl = 'https://mail.google.com/mail/?tab=rm&ogbl'
