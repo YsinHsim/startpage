@@ -1,7 +1,6 @@
 <template>
   <div class="h-screen background-container" :style="wallpaperStyle">
     <div class="top-4 right-4 fixed flex gap-2">
-      <!-- AI Dropdown Menu -->
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
@@ -17,21 +16,22 @@
           <DropdownMenuItem @click="openQwenAiTab">Qwen AI</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <!-- Music Button -->
+      
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+            <Music4 />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel><span class="font-bold">Music Player</span></DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem @click="openYoutubeMusicTab">Open in New Tab</DropdownMenuItem>
+          <DropdownMenuItem @click="toggleMusicPlayer">Floating Player</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button @click="openYoutubeMusicTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
-              <Music4 />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <span>Music</span>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-      <!-- Youtube Button -->
-       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
             <Button @click="openYoutubeTab" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
@@ -43,7 +43,6 @@
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <!-- Search Engine Dropdown Menu -->
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
@@ -63,7 +62,6 @@
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <!-- Social Button -->
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
@@ -88,7 +86,33 @@
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <!-- Wallpaper Dropdown Menu -->
+      
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button @click="toggleGifPlayer" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+              <Film />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <span>Toggle GIF</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button @click="togglePosterPlayer" size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
+              <Image />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <span>Toggle Poster</span>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Button size="icon" variant="secondary" class="transition-all duration-500 hover:shadow-xl text-blue-900">
@@ -102,30 +126,23 @@
           <DropdownMenuItem @click="isAddWallpaperDialogOpen = true">Add Wallpaper</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <!-- Dialog for Add Wallpaper -->
       <Dialog :open="isAddWallpaperDialogOpen" @update:open="isAddWallpaperDialogOpen = $event">
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Wallpaper</DialogTitle>
           </DialogHeader>
-
           <div class="flex flex-col gap-2">
             <Input id="add-image-url" type="text" v-model="newWallpaperInput" @keydown.enter="addWallpaper" placeholder="Enter image url.." />
             <Button @click="addWallpaper">Add Wallpaper</Button>
           </div>
-
         </DialogContent>
       </Dialog>
-      <!-- Dialog for Wallpaper List -->
       <Dialog :open="isWallpaperListDialogOpen" @update:open="isWallpaperListDialogOpen = $event">
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Saved Wallpapers</DialogTitle>
-            <DialogDescription>
-              Apply or delete your saved wallpapers from this list.
-            </DialogDescription>
+            <DialogDescription>Apply or delete your saved wallpapers from this list.</DialogDescription>
           </DialogHeader>
-          
           <div v-if="savedWallpapers.length > 0" class="flex justify-center">
             <Carousel class="relative w-full max-w-xs">
               <CarouselContent>
@@ -133,8 +150,8 @@
                   <div class="p-2 flex flex-col gap-2">
                     <img :src="defaultWallpaper" alt="defaultWallpaper" class="rounded shadow-lg"/>
                     <div class="flex justify-center gap-2">
-                      <Button size="sm" variant="outline" @click="applySavedWallpaper(url)">Apply</Button>
-                      <Button size="sm" variant="destructive" disabled @click="deleteWallpaper(url)">Delete</Button>
+                      <Button size="sm" variant="outline" @click="applySavedWallpaper(defaultWallpaper)">Apply</Button>
+                      <Button size="sm" variant="destructive" disabled>Delete</Button>
                     </div>
                   </div>
                 </CarouselItem>
@@ -153,16 +170,13 @@
             </Carousel>
           </div>
           <div v-else class="text-center text-gray-500">
-            <!-- No wallpapers saved yet. -->
             <p class="italic">Currently only default wallpaper available.</p>
             <div class="flex flex-col gap-2 mt-2"> 
               <img :src="defaultWallpaper" alt="defaultWallpaper" class="rounded shadow-lg" />
             </div>
           </div>
-
         </DialogContent>
       </Dialog>
-      <!-- Email Button -->
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger as-child>
@@ -176,8 +190,8 @@
         </Tooltip>
       </TooltipProvider>
     </div>
+    
     <div class="flex justify-center items-center h-full shadow-lg">
-      <!-- Search Card -->
       <div class="p-4 w-2/5 shadow-2xl rounded-sm bg-white">
         <div class="mb-8 mt-4 text-center">
           <p class="font-bold text-3xl">{{ currentTime }}</p>
@@ -191,6 +205,48 @@
         </div>
       </div>
     </div>
+    
+    <div v-if="isMusicPlayerVisible" class="floating-player shadow-2xl rounded-lg" :style="playerStyle">
+      <div class="player-header" @mousedown="dragStart($event, 'music')">
+        <span class="font-semibold text-sm">YouTube Music</span>
+        <Button @click="hideMusicPlayer" variant="ghost" size="icon" class="h-6 w-6"><X class="h-4 w-4" /></Button>
+      </div>
+      <div class="player-content">
+        <!-- <iframe width="100%" height="100%" src="https://www.youtube.com/embed/gi-txPVUw_E?si=SYlMkU8ANWTO5WD4" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> -->
+        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/PxcGOEb6cb8?si=438376fGLgMiVzNg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <div v-if="isGifPlayerVisible" class="floating-gif-player shadow-2xl rounded-md" :style="playerGifStyle">
+      <div class="player-header" @mousedown="dragStart($event, 'gif')">
+        <span class="font-semibold text-sm">Music GIF</span>
+        <Button @click="hideGifPlayer" variant="ghost" size="icon" class="h-6 w-6"><X class="h-4 w-4" /></Button>
+      </div>
+      <div class="player-content">
+        <img 
+          src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.pinimg.com%2Foriginals%2F3d%2F03%2F80%2F3d0380fb32e1b11ff43384afbb93b4c5.gif&f=1&nofb=1&ipt=86d8c1043c893ce87c547a2a00b53cb4eafb5a1cf3a00ba0ad7500f5bdcc55e8" 
+          alt="Music GIF"
+        />
+      </div>
+    </div>
+
+    <div v-if="isPosterPlayerVisible" class="floating-poster-player shadow-2xl rounded-sm" :style="posterPlayerStyle">
+      <div class="player-header" @mousedown="dragStart($event, 'poster')">
+        <span class="font-semibold text-sm">Poster</span>
+        <Button @click="hidePosterPlayer" variant="ghost" size="icon" class="h-6 w-6"><X class="h-4 w-4" /></Button>
+      </div>
+      <div class="player-content">
+        <!-- <img 
+          src="https://lh3.googleusercontent.com/a/ACg8ocIFB4DSl1w-55nqTzVeRnRXilHK68xQvBRWlaz8gHxPag48f2KU=s576-c-no" 
+          alt="Poster Image"
+        /> -->
+        <img 
+          src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.tenor.com%2Ftjy8D4yvEAIAAAAC%2Fgojo-satoru.gif&f=1&nofb=1&ipt=c447a5c9821d7e37b49ad256972223624d89278eda452142609f8532f02f7574" 
+          alt="Poster Image"
+        />
+      </div>
+    </div>
+
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger as-child>
@@ -211,301 +267,235 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 
 useHead({
   titleTemplate: (titleChunk) => {
-    return titleChunk ? `${titleChunk} - Startpage` : 'Meow Startpage';
+    return titleChunk ? `${titleChunk} - Startpage` : 'Chrome Dashboard';
   }
 })
 
-/* Import List */
-import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Instagram, Sparkles, Globe, Bird, Earth, Music4, Youtube } from 'lucide-vue-next'
+/* Import List (Added Film and Image icons) */
+import { Wallpaper, Search, ChevronsLeftRightEllipsis, Mail, Facebook, Instagram, Sparkles, Globe, Bird, Earth, Music4, Youtube, X, Film, Image } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@/components/ui/tooltip'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 /* Variable List */
 const currentDay = ref('');
 const currentTime = ref('');
 let timer: NodeJS.Timeout | null = null
 const searchInput = ref('')
-const defaultAccordianValue = 'wallpaperList'
 const isWallpaperListDialogOpen = ref(false)
 const isAddWallpaperDialogOpen = ref(false)
-
-const wallpaperUrl = ref('') // Stores the active wallpaper URL
-const newWallpaperInput = ref('') // Input for adding new wallpaper
+const wallpaperUrl = ref('')
+const newWallpaperInput = ref('')
 const defaultWallpaper = 'https://pbs.twimg.com/media/GqiNuAWXYAA0MDD?format=jpg&name=large'
-
-// Array to store all saved wallpaper URLs
 const savedWallpapers = ref<string[]>([])
-
 const searchEngines = ref([
   { name: 'Google', urlTemplate: 'https://www.google.com/search?q=', icon: Earth },
   { name: 'DuckDuckGo', urlTemplate: 'https://duckduckgo.com/?q=', icon: Bird }
 ])
 const selectedSearchEngine = ref(searchEngines.value[0])
 
+/* MODIFIED Player Variables */
+const isMusicPlayerVisible = ref(false)
+const isGifPlayerVisible = ref(false)
+const isPosterPlayerVisible = ref(false)
+
+const playerPosition = ref({ x: 50, y: 150 })
+const playerGifPosition = ref({ x: 0, y: 0 }) // Will be set onMounted
+const posterPlayerPosition = ref({ x: 0, y: 0 }) // Will be set onMounted
+
+const isDragging = ref(false)
+const dragOffset = ref({ x: 0, y: 0 })
+const currentlyDragging = ref<'music' | 'gif' | 'poster' | null>(null)
+
 /* Function List */
-const openQwenAiTab = () => {
-  const qwenAiTabUrl = 'https://chat.qwen.ai/'
-  window.open(qwenAiTabUrl, '_blank', 'noopener,noreferrer')
-}
-const openDeepSeekTab = () => {
-  const deepSeekTabUrl = 'https://chat.deepseek.com/'
-  window.open(deepSeekTabUrl, '_blank', 'noopener,noreferrer')
-}
-const openChatGptTab = () => {
-  const chatGptTabUrl = 'https://chatgpt.com/'
-  window.open(chatGptTabUrl, '_blank', 'noopener,noreferrer')
-}
-const openGeminiTab = () => {
-  const geminiTabUrl = 'https://gemini.google.com/app'
-  window.open(geminiTabUrl, '_blank', 'noopener,noreferrer')
-}
-const openMyPortfolio = () => {
-  const portfolioUrl = 'https://yasinhassim.vercel.app'
-  window.open(portfolioUrl, '_blank', 'noopener,noreferrer')
-}
-const openYoutubeMusicTab = () => {
-  const youtubeMusicUrl = 'https://music.youtube.com/'
-  window.open(youtubeMusicUrl, '_blank', 'noopener,noreferrer')
-}
-const openYoutubeTab = () => {
-  const youtubeUrl = 'https://www.youtube.com/'
-  window.open(youtubeUrl, '_blank', 'noopener,noreferrer')
-}
-const openGmailTab = () => {
-  const gmailTabUrl = 'https://mail.google.com/mail/?tab=rm&ogbl'
-  window.open(gmailTabUrl, '_blank', 'noopener,noreferrer')
-}
-const openFacebookTab = () => {
-  const facebookUrlTab = 'https://www.facebook.com/'
-  window.open(facebookUrlTab, '_blank', 'noopener,noreferrer')
-}
-const openInstagramTab = () => {
-  const instagramUrlTab = 'https://www.instagram.com/'
-  window.open(instagramUrlTab, '_blank', 'noopener,noreferrer')
-}
+const openQwenAiTab = () => window.open('https://chat.qwen.ai/', '_blank', 'noopener,noreferrer');
+const openDeepSeekTab = () => window.open('https://chat.deepseek.com/', '_blank', 'noopener,noreferrer');
+const openChatGptTab = () => window.open('https://chatgpt.com/', '_blank', 'noopener,noreferrer');
+const openGeminiTab = () => window.open('https://gemini.google.com/app', '_blank', 'noopener,noreferrer');
+const openMyPortfolio = () => window.open('https://yasinhassim.vercel.app', '_blank', 'noopener,noreferrer');
+const openYoutubeMusicTab = () => window.open('https://music.youtube.com/', '_blank', 'noopener,noreferrer');
+const openYoutubeTab = () => window.open('https://www.youtube.com/', '_blank', 'noopener,noreferrer');
+const openGmailTab = () => window.open('https://mail.google.com/mail/?tab=rm&ogbl', '_blank', 'noopener,noreferrer');
+const openFacebookTab = () => window.open('https://www.facebook.com/', '_blank', 'noopener,noreferrer');
+const openInstagramTab = () => window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
 
 const setSearchEngine = (engine: typeof searchEngines.value[0]) => {
   selectedSearchEngine.value = engine
-  // Save the user's choice to local storage so it's remembered
   localStorage.setItem('userSelectedEngine', engine.name)
 }
-
 const updateDateTime = () => {
   const now = new Date()
-
-  // Get current day (e.g., "Monday", "Tuesday")
   currentDay.value = now.toLocaleDateString('en-US', { weekday: 'long' })
-
-  // Get current time in HH:MM (24-hour) format
-  currentTime.value = now.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23' // Ensures 24-hour format
-  })
+  currentTime.value = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 }
-
 const performSearch = () => {
   const query = searchInput.value.trim()
-
   if (query) {
-    // Use the urlTemplate from the *selected* search engine
     const searchUrl = `${selectedSearchEngine.value.urlTemplate}${encodeURIComponent(query)}`
-    
-    // Open the URL in a new tab/window
     window.open(searchUrl, '_blank')
     searchInput.value = ''
   }
 }
-
-// Function to add a new wallpaper to the list
 const addWallpaper = () => {
   const url = newWallpaperInput.value.trim()
   if (url) {
     try {
-      new URL(url) // Basic URL validation
-      if (!savedWallpapers.value.includes(url)) { // Avoid duplicates
+      new URL(url)
+      if (!savedWallpapers.value.includes(url)) {
         savedWallpapers.value.push(url)
-        // NEW TRY-CATCH FOR LOCALSTORAGE.SETITEM
-        try {
-          localStorage.setItem('savedWallpapers', JSON.stringify(savedWallpapers.value))
-          console.log('addWallpaper: "savedWallpapers" set in localStorage to:', JSON.stringify(savedWallpapers.value));
-        } catch (storageError) {
-          console.error('addWallpaper: Error saving "savedWallpapers" to localStorage:', storageError);
-          alert('Failed to save wallpaper list. Your browser storage might be full or restricted.');
-        }
+        localStorage.setItem('savedWallpapers', JSON.stringify(savedWallpapers.value))
       }
-      applySavedWallpaper(url) // Apply the newly added wallpaper
-      newWallpaperInput.value = '' // Clear the input field
-    } catch (e) {
-      alert('Please enter a valid URL for the wallpaper')
-      console.error('Invalid URL or other error in addWallpaper:', e)
-    }
-  } else {
-    alert('Please enter a wallpaper URL')
-  }
+      applySavedWallpaper(url)
+      newWallpaperInput.value = ''
+    } catch (e) { alert('Please enter a valid URL for the wallpaper') }
+  } else { alert('Please enter a wallpaper URL') }
 }
-
-// Function to apply a wallpaper from the saved list
 const applySavedWallpaper = (url: string) => {
   wallpaperUrl.value = url
   localStorage.setItem('userActiveWallpaper', url)
-  // NEW DIAGNOSTIC LOG: Confirm userActiveWallpaper set operation
-  console.log('applySavedWallpaper: "userActiveWallpaper" set in localStorage to:', url);
 }
-
-// Function to delete a wallpaper from the list
 const deleteWallpaper = (urlToDelete: string) => {
   savedWallpapers.value = savedWallpapers.value.filter(url => url !== urlToDelete)
-  localStorage.setItem('savedWallpapers', JSON.stringify(savedWallpapers.value)) // Save the updated array
-  console.log('deleteWallpaper: "savedWallpapers" updated in localStorage to:', JSON.stringify(savedWallpapers.value));
+  localStorage.setItem('savedWallpapers', JSON.stringify(savedWallpapers.value))
 
-  // If the deleted wallpaper was the currently active one, set to default
   if (wallpaperUrl.value === urlToDelete) {
     wallpaperUrl.value = defaultWallpaper
-    localStorage.removeItem('userActiveWallpaper') // Clear active wallpaper from storage
-    console.log('deleteWallpaper: "userActiveWallpaper" removed or set to default.');
-  }
-  // If the list becomes empty and it's not already default, reset to default
-  if (savedWallpapers.value.length === 0 && wallpaperUrl.value !== defaultWallpaper) {
-      wallpaperUrl.value = defaultWallpaper;
-      localStorage.removeItem('userActiveWallpaper');
-      console.log('deleteWallpaper: "userActiveWallpaper" removed due to empty list.');
+    localStorage.removeItem('userActiveWallpaper')
   }
 }
 
+/* MODIFIED Player Visibility Functions */
+const toggleMusicPlayer = () => { isMusicPlayerVisible.value = !isMusicPlayerVisible.value }
+const hideMusicPlayer = () => { isMusicPlayerVisible.value = false }
+const toggleGifPlayer = () => { isGifPlayerVisible.value = !isGifPlayerVisible.value }
+const hideGifPlayer = () => { isGifPlayerVisible.value = false }
+const togglePosterPlayer = () => { isPosterPlayerVisible.value = !isPosterPlayerVisible.value }
+const hidePosterPlayer = () => { isPosterPlayerVisible.value = false }
 
-/* Computed Property for Wallpaper Style */
-const wallpaperStyle = computed(() => {
-  const imageUrl = wallpaperUrl.value || defaultWallpaper // Use default if wallpaperUrl is empty
-  return {
-    backgroundImage: `url('${imageUrl}')`,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    backgroundRepeat: 'no-repeat',
-    filter: 'brightness(0. 2)' // Example: makes background slightly darker
-  }
-})
+/* MODIFIED Drag and Drop Functions */
+const dragStart = (event: MouseEvent, playerType: 'music' | 'gif' | 'poster') => {
+  isDragging.value = true
+  currentlyDragging.value = playerType
 
+  const positionMap = {
+    music: playerPosition,
+    gif: playerGifPosition,
+    poster: posterPlayerPosition,
+  };
 
-/* onMounted List */
+  const pos = positionMap[playerType].value;
+  dragOffset.value = { x: event.clientX - pos.x, y: event.clientY - pos.y };
+  
+  window.addEventListener('mousemove', dragMove)
+  window.addEventListener('mouseup', dragEnd)
+}
+
+const dragMove = (event: MouseEvent) => {
+  if (!isDragging.value) return;
+  const newPos = { x: event.clientX - dragOffset.value.x, y: event.clientY - dragOffset.value.y };
+
+  if (currentlyDragging.value === 'music') playerPosition.value = newPos;
+  else if (currentlyDragging.value === 'gif') playerGifPosition.value = newPos;
+  else if (currentlyDragging.value === 'poster') posterPlayerPosition.value = newPos;
+}
+
+const dragEnd = () => {
+  isDragging.value = false
+  currentlyDragging.value = null
+  window.removeEventListener('mousemove', dragMove)
+  window.removeEventListener('mouseup', dragEnd)
+}
+
+/* Computed Properties */
+const wallpaperStyle = computed(() => ({ backgroundImage: `url('${wallpaperUrl.value || defaultWallpaper}')`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }));
+const playerStyle = computed(() => ({ top: `${playerPosition.value.y}px`, left: `${playerPosition.value.x}px` }));
+const playerGifStyle = computed(() => ({ top: `${playerGifPosition.value.y}px`, left: `${playerGifPosition.value.x}px` }));
+const posterPlayerStyle = computed(() => ({ top: `${posterPlayerPosition.value.y}px`, left: `${posterPlayerPosition.value.x}px` }));
+
+/* onMounted and onUnmounted */
 onMounted(() => {
-  // Update immediately when component mounts
   updateDateTime()
-  // Update every second for a live clock effect
   timer = setInterval(updateDateTime, 1000)
 
-  // Load saved wallpapers list from local storage
+  // Set initial positions for floating elements
+  const posterWidth = 250; // from CSS
+  posterPlayerPosition.value = { x: (window.innerWidth / 2) - (posterWidth / 2), y: 40 };
+
+  const gifWidth = 220; // from CSS
+  const gifHeight = 220; // from CSS
+  playerGifPosition.value = { x: window.innerWidth - gifWidth - 20, y: window.innerHeight - gifHeight - 20 };
+
+  // Load saved data from localStorage
   const storedWallpapers = localStorage.getItem('savedWallpapers')
-  console.log('onMounted: Value retrieved from localStorage for "savedWallpapers":', storedWallpapers); // Diagnostic log here
   if (storedWallpapers) {
-    try {
-      const parsedWallpapers = JSON.parse(storedWallpapers)
-      console.log('onMounted: Successfully parsed "savedWallpapers". Data:', parsedWallpapers);
-      if (Array.isArray(parsedWallpapers)) {
-        savedWallpapers.value = parsedWallpapers
-        console.log('onMounted: savedWallpapers ref value updated to:', savedWallpapers.value)
-      }
-    } catch (e) {
-      console.error("onMounted: Failed to parse saved wallpapers from localStorage:", e)
-      localStorage.removeItem('savedWallpapers') // Clear corrupted data
-      console.log('onMounted: "savedWallpapers" removed from localStorage due to parse error.');
-    }
-  } else {
-    console.log('onMounted: "savedWallpapers" was null or empty in localStorage.');
+    try { savedWallpapers.value = JSON.parse(storedWallpapers) }
+    catch (e) { console.error("Failed to parse saved wallpapers:", e) }
   }
 
-  // Load the currently active wallpaper
   const activeWallpaper = localStorage.getItem('userActiveWallpaper')
-  console.log('onMounted: Value retrieved from localStorage for "userActiveWallpaper":', activeWallpaper);
   if (activeWallpaper) {
     wallpaperUrl.value = activeWallpaper
   } else {
-    // If no active wallpaper set, but there are saved ones, apply the first one
-    if (savedWallpapers.value.length > 0) {
-      applySavedWallpaper(savedWallpapers.value[0]);
-      console.log('onMounted: No active wallpaper, applying first saved wallpaper.');
-    } else {
-      wallpaperUrl.value = defaultWallpaper; // Fallback to default if no saved or active
-      console.log('onMounted: No active or saved wallpapers, applying default wallpaper.');
-    }
+    wallpaperUrl.value = defaultWallpaper;
   }
 
   const savedEngineName = localStorage.getItem('userSelectedEngine')
   if (savedEngineName) {
     const foundEngine = searchEngines.value.find(e => e.name === savedEngineName)
-    if (foundEngine) {
-      selectedSearchEngine.value = foundEngine
-    }
+    if (foundEngine) selectedSearchEngine.value = foundEngine;
   }
 })
 
-// When the component is unmounted (removed from the page)
 onUnmounted(() => {
-  // Clear the interval to prevent memory leaks
-  if (timer) {
-    clearInterval(timer)
-  }
+  if (timer) clearInterval(timer);
 })
 </script>
 
 <style>
-/* Base styles for the page */
-body {
-  font-family: sans-serif;
-  margin: 0;
-}
+/* Base styles */
+body { font-family: sans-serif; margin: 0; }
+.background-container { min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 0; }
+.background-container::before { content: ''; position: absolute; inset: 0; background-color: rgba(0, 0, 0, 0.3); z-index: -1; }
 
-/* Ensure the background container always covers the screen */
-.background-container {
-  min-height: 100vh;
+/* Floating Player Base Styles */
+.floating-player, .floating-gif-player, .floating-poster-player {
+  position: fixed;
+  z-index: 1000;
+  /* background-color: #212121; */
+  background-color: transparent;
+  /* border: 1px solid #424242; */
   display: flex;
   flex-direction: column;
-  position: relative;
-  z-index: 0;
 }
 
-/* Adds a subtle dark overlay for better text readability on varying wallpapers */
-.background-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3); /* Dark overlay */
-  z-index: -1; /* Ensure overlay is behind content but in front of background image */
-}
+/* Individual Player Sizes */
+.floating-player { width: 350px; height: 450px; }
+/* .floating-gif-player { width: 220px; height: 220px; } */
+.floating-poster-player { width: 200px; height: 200px; }
 
-/* Custom button primary color */
-.primaryColor {
-  background-color: #0284c7; /* Tailwind's sky-600 */
-  transition: background-color 0.3s ease; /* Smooth transition for hover */
+.player-header {
+  /* background-color: #333333; */
+  background-color: #2A394C;
+  color: white;
+  padding: 4px 8px;
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
 }
-
-.primaryColor:hover {
-  background-color: #0369a1; /* Tailwind's sky-700 */
+.player-content {
+  flex-grow: 1;
+  /* background-color: #181818; */
+  background-color: transparent;
 }
-
-/* Additional utility class (if needed for labels, etc.) */
-.labelColor {
-  color: #424949;
+.player-content img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-
 </style>
